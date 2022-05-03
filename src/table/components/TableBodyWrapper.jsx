@@ -7,6 +7,7 @@ import getCellRenderer from './renderer';
 import { getBodyStyle } from '../utils/styling-utils';
 import { bodyHandleKeyPress } from '../utils/handle-key-press';
 import { handleClickToFocusBody } from '../utils/handle-accessibility';
+import { handleMouseUp, bodyHandleMouseDown, bodyHandleMouseEnter } from '../utils/handle-mouse-event';
 
 function TableBodyWrapper({
   rootElement,
@@ -106,7 +107,12 @@ function TableBodyWrapper({
                       keyboard,
                     })
                   }
-                  onMouseDown={() => handleClickToFocusBody(cell, rootElement, setFocusedCellCoord, keyboard)}
+                  onMouseDown={(evt) => bodyHandleMouseDown(evt, cell)}
+                  onMouseEnter={(evt) => bodyHandleMouseEnter(evt, cell)}
+                  onMouseUp={(evt) =>
+                    handleMouseUp(selectionState, cell, selectionDispatch, evt, announce) &&
+                    handleClickToFocusBody(cell, rootElement, setFocusedCellCoord, keyboard)
+                  }
                 >
                   {value}
                 </CellRenderer>

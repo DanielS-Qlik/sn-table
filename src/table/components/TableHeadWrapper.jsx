@@ -1,10 +1,12 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/system';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
+import SearchIcon from '@mui/icons-material/Search';
+
 import { useContextSelector, TableContext } from '../context';
 import { getHeaderStyle } from '../utils/styling-utils';
 import { headHandleKeyPress } from '../utils/handle-key-press';
@@ -32,6 +34,7 @@ function TableHeadWrapper({
   translator,
   selectionsAPI,
   keyboard,
+  embed,
 }) {
   const { columns, paginationNeeded } = tableData;
   const isFocusInHead = useContextSelector(TableContext, (value) => value.focusedCellCoord[0] === 0);
@@ -52,8 +55,15 @@ function TableHeadWrapper({
     },
   };
 
+  const tableContainerRef = useRef();
+  const handleSearch = async (evt, label) => {
+    evt.preventDefault();
+    const fieldInstance = await embed.field(label);
+    fieldInstance.mount(tableContainerRef.current);
+  };
+
   return (
-    <TableHead>
+    <TableHead ref={tableContainerRef}>
       <TableRow sx={headRowStyle} className="sn-table-row">
         {columns.map((column, columnIndex) => {
           const tabIndex = columnIndex === 0 && !keyboard.enabled ? 0 : -1;
@@ -61,6 +71,7 @@ function TableHeadWrapper({
 
           return (
             <TableCell
+              // ref={tableCellWrapperRef}
               sx={headerStyle}
               key={column.id}
               align={column.align}
@@ -81,22 +92,30 @@ function TableHeadWrapper({
                 )
               }
               onMouseDown={() => handleClickToFocusHead(columnIndex, rootElement, setFocusedCellCoord, keyboard)}
-              onClick={() => !selectionsAPI.isModal() && !constraints.active && changeSortOrder(layout, column)}
             >
-              <TableSortLabel
-                sx={tableSortLabelStyle}
-                active={isCurrentColumnActive}
-                title={!constraints.passive && column.sortDirection} // passive: turn off tooltips.
-                direction={column.sortDirection}
-                tabIndex={-1}
-              >
-                {column.label}
-                {isFocusInHead && (
-                  <VisuallyHidden data-testid={`VHL-for-col-${columnIndex}`}>
-                    {translator.get('SNTable.SortLabel.PressSpaceToSort')}
-                  </VisuallyHidden>
-                )}
-              </TableSortLabel>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <SearchIcon
+                  aria-label="search"
+                  fontSize="small"
+                  sx={{ cursor: 'pointer' }}
+                  onClick={(evt) => handleSearch(evt, column.label)}
+                />
+                <TableSortLabel
+                  onClick={() => !selectionsAPI.isModal() && !constraints.active && changeSortOrder(layout, column)}
+                  sx={tableSortLabelStyle}
+                  active={isCurrentColumnActive}
+                  title={!constraints.passive && column.sortDirection} // passive: turn off tooltips.
+                  direction={column.sortDirection}
+                  tabIndex={-1}
+                >
+                  {column.label}
+                  {isFocusInHead && (
+                    <VisuallyHidden data-testid={`VHL-for-col-${columnIndex}`}>
+                      {translator.get('SNTable.SortLabel.PressSpaceToSort')}
+                    </VisuallyHidden>
+                  )}
+                </TableSortLabel>
+              </div>
             </TableCell>
           );
         })}
@@ -115,6 +134,7 @@ TableHeadWrapper.propTypes = {
   selectionsAPI: PropTypes.object.isRequired,
   keyboard: PropTypes.object.isRequired,
   translator: PropTypes.object.isRequired,
+  embed: PropTypes.object.isRequired,
 };
 
 export default memo(TableHeadWrapper);

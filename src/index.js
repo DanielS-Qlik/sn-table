@@ -14,6 +14,7 @@ import {
   useKeyboard,
   useRect,
   useApp,
+  useEmbed,
 } from '@nebula.js/stardust';
 import { createRoot } from 'react-dom/client';
 
@@ -64,6 +65,7 @@ export default function supernova(env) {
       const muiTheme = muiSetup(direction);
       const keyboard = useKeyboard();
       const rect = useRect();
+      const embed = useEmbed();
       const [pageInfo, setPageInfo] = useState(() => initialPageInfo);
       const [tableData] = usePromise(() => {
         return env.carbon ? nothing() : manageData(model, layout, pageInfo, setPageInfo);
@@ -96,6 +98,7 @@ export default function supernova(env) {
             keyboard,
             rect,
             footerContainer,
+            embed,
           });
         }
       }, [
@@ -109,6 +112,7 @@ export default function supernova(env) {
         keyboard.active,
         translator.language(),
         rect.width,
+        embed,
       ]);
 
       // this is the one we want to use for carbon

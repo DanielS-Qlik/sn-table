@@ -1,5 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { perf, wait } from 'react-performance-testing';
+import 'jest-performance-testing';
+
 import AnnounceElements from '../AnnounceElements';
 
 describe('<AnnounceElements />', () => {
@@ -10,5 +13,16 @@ describe('<AnnounceElements />', () => {
 
     expect(firstAnnounceElement).toBeVisible();
     expect(secondAnnounceElement).toBeVisible();
+  });
+
+  it('should render AnnounceElements once and div twice', () => {
+    const { renderCount } = perf(React);
+
+    render(<AnnounceElements />);
+
+    wait(() => {
+      expect(renderCount.current.AnnounceElements).toBeRenderedTimes(1);
+      expect(renderCount.current['styled.div']).toBeRenderedTimes(2);
+    });
   });
 });

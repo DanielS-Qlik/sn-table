@@ -36,7 +36,7 @@ function TableBodyWrapper({
 
   useEffect(() => {
     addSelectionListeners({ api: selectionsAPI, selectionDispatch, setShouldRefocus, keyboard, tableWrapperRef });
-  }, []);
+  }, [selectionsAPI, keyboard, tableWrapperRef]);
 
   return (
     <StyledTableBody paginationNeeded={paginationNeeded} bodyCellStyle={bodyCellStyle}>

@@ -55,7 +55,7 @@ export default function TableWrapper(props) {
         politeness: 'assertive',
       });
     },
-    [pageInfo, setPageInfo, totalPages, announce]
+    [pageInfo, totalPages, announce]
   );
 
   const handleKeyDown = (evt) => {

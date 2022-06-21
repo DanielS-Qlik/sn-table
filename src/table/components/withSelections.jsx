@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useContextSelector, TableContext } from '../context';
 import { getSelectionStyle } from '../utils/styling-utils';
@@ -13,7 +13,10 @@ export default function withSelections(CellComponent) {
     const handleMouseUp = (evt) =>
       cell.isSelectable && evt.button === 0 && selectionDispatch({ type: 'select', payload: { cell, evt, announce } });
 
-    const selectionStyling = getSelectionStyle(styling, cellSelectionState);
+    const selectionStyling = useMemo(
+      () => getSelectionStyle(styling, cellSelectionState),
+      [styling, cellSelectionState]
+    );
 
     return <CellComponent {...passThroughProps} styling={selectionStyling} onMouseUp={handleMouseUp} />;
   };
